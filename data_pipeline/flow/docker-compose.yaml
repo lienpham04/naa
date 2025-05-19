@@ -45,6 +45,37 @@ x-airflow-common:
     postgres:
       condition: service_healthy
 services:
+  # Airflow init service
+  mlflow:
+    image: python:3.10-slim
+    container_name: mlflow-server
+    command: >
+      sh -c "
+        pip install mlflow[extras] psycopg2-binary &&
+        mlflow server 
+          --backend-store-uri postgresql+psycopg2://airflow:airflow@postgres/airflow 
+          --default-artifact-root /mlflow/artifacts 
+          --host 0.0.0.0 
+          --port 5000
+      "
+    ports:
+      - "5000:5000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./mlruns:/mlflow/artifacts
+
+# Streamlitt
+  streamlit-app:
+    build: .
+    container_name: car-detection-ui
+    ports:
+      - "8501:8501"
+    volumes:
+      - .:/app
+    restart: always
+
   # Postgres service for Airflow metadata
   postgres:
     image: postgres:13
@@ -186,15 +217,3 @@ services:
 
 volumes:
   postgres-db-volume:
-
-
-
-
-
-
-
-
-
-
-
-

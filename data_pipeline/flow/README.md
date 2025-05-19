@@ -10,6 +10,10 @@ chmod +x run.sh
 ```
 
 Current problem: 
-Database airflow (Save logs, info): docker compose exec postgres psql -U airflow -d airflow 
+Database airflow (Save logs, info): 
+
+docker compose up -d
+docker compose exec postgres psql -U airflow -d airflow 
+
 Saving images and labels: From Pgadmin, create a db named carrrr, give permissions for airflow user (password airflow)
 To-do: In crawl_dag, find ways to connect to envs(API, db) outside of the file 

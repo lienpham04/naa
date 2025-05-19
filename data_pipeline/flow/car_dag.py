@@ -16,10 +16,10 @@ logging.basicConfig(level=logging.INFO)
 # --- Configuration ---
 IMAGES_DIR = "/opt/airflow/data"
 LABELS_CSV = "/opt/airflow/vehicle_labels.csv"
-DB_HOST = "172.20.219.28"
+DB_HOST = "127.0.0.1"
 DB_NAME = "carrrr"
 DB_USER = "airflow"
-DB_PASSWORD = "airflow"
+DB_PASSWORD = "kimlienhg123"
 DB_PORT = 5432
 BATCH_SIZE = 100
 

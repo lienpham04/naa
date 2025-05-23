@@ -14,6 +14,8 @@ docker-compose up -d
 
 # Show container status
 docker-compose ps
+docker-compose build
+docker-compose up
 
 
 # chmod +x run.sh

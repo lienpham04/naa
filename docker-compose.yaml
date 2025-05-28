@@ -1,10 +1,10 @@
-version: '3.8'
+# version: '3.8'
 
 x-airflow-common:
   &airflow-common
   build:
-    context: .
-    dockerfile: Dockerfile.airflow
+    context: ./airflow
+    dockerfile: Dockerfile
   environment:
     &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: LocalExecutor
@@ -20,8 +20,11 @@ x-airflow-common:
     - ./logs:/opt/airflow/logs
     - ./config:/opt/airflow/config
     - ./plugins:/opt/airflow/plugins
-    - ../traindata/data:/opt/airflow/data
-    - ../traindata/vehicle_labels.csv:/opt/airflow/vehicle_labels.csv
+    - ./serving_streamlit:/opt/airflow/serving_streamlit
+    - ./mlruns:/opt/airflow/mlruns
+    # - ./airflow/scripts:/opt/airflow/scripts
+    # - ../traindata/data:/opt/airflow/data
+    - /Users/lienpham/Desktop/mlops_test/mlops/serving_streamlit/car_labels.csv:/opt/airflow/car_labels.csv
     - ./mlruns:/opt/airflow/mlruns
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
@@ -40,10 +43,10 @@ services:
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "airflow"]
       interval: 10s
-      retries: 5
+      retries: 1
       start_period: 5s
     ports:
-      - "5432:5432"
+      - "5433:5432"
     restart: always
 
   mlflow:
@@ -59,7 +62,7 @@ services:
           --port 5000
       "
     ports:
-      - "5000:5000"
+      - "5001:5000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -68,13 +71,13 @@ services:
 
   streamlit-app:
     build:
-      context: .
+      context: ./serving_streamlit
       dockerfile: Dockerfile
     container_name: car-detection-ui
     ports:
       - "8501:8501"
     volumes:
-      - .:/app
+      - ./serving_streamlit:/app
     restart: always
 
   airflow-webserver:
@@ -86,7 +89,7 @@ services:
       test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
       interval: 30s
       timeout: 10s
-      retries: 5
+      retries: 1
       start_period: 30s
     restart: always
     depends_on:
@@ -104,7 +107,7 @@ services:
       test: ["CMD", "curl", "--fail", "http://localhost:8974/health"]
       interval: 30s
       timeout: 10s
-      retries: 5
+      retries: 1
       start_period: 30s
     restart: always
     env_file:
